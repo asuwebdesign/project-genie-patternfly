@@ -121,6 +121,8 @@ export default function HomePage() {
   return (
     <ClientOnly>
       <LoginPage
+        brandImgSrc={'/RedHat_favicon_0319.svg'}
+        brandImgAlt="PatternFly logo"
         footerListItems={footerLinks}
         textContent="Welcome to Project Genie, your AI-powered chat assistant. Sign in with your Google account to get started."
         loginTitle="Welcome to Project Genie"

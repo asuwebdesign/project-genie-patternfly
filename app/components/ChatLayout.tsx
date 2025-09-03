@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import {
   Page,
@@ -41,22 +41,23 @@ export function ChatLayout({ children }: ChatLayoutProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+
+  console.log('Profile:', profile)
+
+  // =============================================================================
+  // Client-side hydration fix
+  // Ensure client-side rendering matches server-side
+  // =============================================================================
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   // =============================================================================
   // Data Fetching
   // Fetches chat threads for navigation display
   // =============================================================================
-  useEffect(() => {
-    if (user && session) {
-      console.log('User authenticated, fetching threads...', user.id)
-      fetchThreads()
-    } else {
-      console.log('No user authenticated or no session')
-      setIsLoading(false)
-    }
-  }, [user, session])
-
-  const fetchThreads = async () => {
+  const fetchThreads = useCallback(async () => {
     try {
       console.log('Fetching threads...')
       setIsLoading(true)
@@ -89,7 +90,17 @@ export function ChatLayout({ children }: ChatLayoutProps) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [session?.access_token])
+
+  useEffect(() => {
+    if (user && session) {
+      console.log('User authenticated, fetching threads...', user.id)
+      fetchThreads()
+    } else {
+      console.log('No user authenticated or no session')
+      setIsLoading(false)
+    }
+  }, [user, session, fetchThreads])
 
   // =============================================================================
   // Navigation Handlers
@@ -116,8 +127,18 @@ export function ChatLayout({ children }: ChatLayoutProps) {
     setIsDropdownOpen(!isDropdownOpen)
   }
 
-  // Group threads by relative date
-  const groupThreadsByDate = () => {
+  // Group threads by relative date - memoized and client-only to prevent hydration mismatch
+  const threadGroups = useMemo(() => {
+    // Return empty groups during SSR to prevent hydration mismatch
+    if (!isClient) {
+      return {
+        today: [] as ChatThread[],
+        yesterday: [] as ChatThread[],
+        thisWeek: [] as ChatThread[],
+        older: [] as ChatThread[],
+      }
+    }
+
     const now = new Date()
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
     const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000)
@@ -144,9 +165,8 @@ export function ChatLayout({ children }: ChatLayoutProps) {
     })
 
     return groups
-  }
+  }, [threads, isClient])
 
-  const threadGroups = groupThreadsByDate()
   console.log('Thread groups:', threadGroups)
   console.log('Total threads:', threads.length)
 

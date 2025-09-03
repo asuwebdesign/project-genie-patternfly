@@ -10,6 +10,8 @@ import {
   Spinner,
   EmptyState,
   EmptyStateBody,
+  ModalHeader,
+  ModalBody,
 } from '@patternfly/react-core'
 import type { ChatThread } from '../lib/supabase'
 
@@ -100,11 +102,13 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
   return (
     <Modal
-      title="Search Chat Threads"
       isOpen={isOpen}
       onClose={onClose}
       className="search-modal"
+      variant="medium"
     >
+      <ModalHeader title="Search chats" labelId="search-chats" />
+      <ModalBody>
       <div style={{ marginBottom: '1rem' }}>
         <TextInput
           type="text"
@@ -112,6 +116,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
           onChange={(_, value) => setSearchTerm(value)}
           placeholder="Search by thread title..."
           onKeyPress={handleKeyPress}
+          aria-label="Search chat threads by title"
         />
         <Button
           variant="primary"
@@ -155,7 +160,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
           <EmptyStateBody>
             <h4>No results found</h4>
             <p>
-              No chat threads found matching "{searchTerm}". Try a different
+              No chat threads found matching &quot;{searchTerm}&quot;. Try a different
               search term.
             </p>
             <Button variant="primary" onClick={() => setSearchTerm('')}>
@@ -173,6 +178,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
           </EmptyStateBody>
         </EmptyState>
       )}
+      </ModalBody>
     </Modal>
   )
 }

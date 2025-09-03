@@ -4,8 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Title,
-  TextArea,
-  Button,
   Card,
   CardBody,
   Spinner,
@@ -13,6 +11,7 @@ import {
   AlertActionCloseButton,
 } from '@patternfly/react-core'
 import { ChatLayout } from '../components/ChatLayout'
+import { MessageInput } from '../components/MessageInput'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function ChatPage() {
@@ -98,12 +97,7 @@ export default function ChatPage() {
     }
   }
 
-  const handleKeyPress = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault()
-      handleSendMessage()
-    }
-  }
+
 
   const clearError = () => setError(null)
 
@@ -117,7 +111,7 @@ export default function ChatPage() {
         <div style={{ marginBottom: '2rem' }}>
           <p>
             Start a conversation with our AI assistant. Ask questions, get help
-            with coding, or explore any topic you're interested in.
+            with coding, or explore any topic you&apos;re interested in.
           </p>
         </div>
 
@@ -134,26 +128,16 @@ export default function ChatPage() {
 
         <Card>
           <CardBody>
-            <div style={{ marginBottom: '1rem' }}>
-              <TextArea
-                value={message}
-                onChange={(_, value) => setMessage(value)}
-                placeholder="Type your message here..."
-                rows={4}
-                onKeyPress={handleKeyPress}
-                disabled={isLoading}
-                aria-label="Message input"
-              />
-            </div>
-
-            <Button
-              variant="primary"
-              onClick={handleSendMessage}
+            <MessageInput
+              onSend={(content) => {
+                setMessage(content)
+                // Trigger the send after setting the message
+                setTimeout(() => handleSendMessage(), 0)
+              }}
+              placeholder="Type your message here..."
+              disabled={isLoading}
               isLoading={isLoading}
-              isDisabled={!message.trim()}
-            >
-              Send Message
-            </Button>
+            />
           </CardBody>
         </Card>
 

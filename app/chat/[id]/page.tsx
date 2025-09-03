@@ -1,11 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useState, useEffect, useCallback } from 'react'
+import { useParams } from 'next/navigation'
 import {
   Title,
-  TextArea,
-  Button,
   Card,
   CardBody,
   Spinner,
@@ -15,13 +13,14 @@ import {
   EmptyStateBody,
 } from '@patternfly/react-core'
 import { ChatLayout } from '../../components/ChatLayout'
+import { MarkdownRenderer } from '../../components/MarkdownRenderer'
+import { MessageInput } from '../../components/MessageInput'
 import { useAuth } from '../../contexts/AuthContext'
 import type { ChatMessage, ChatThread } from '../../lib/supabase'
 
 export default function ChatThreadPage() {
   const { id } = useParams()
-  const { user } = useAuth()
-  const router = useRouter()
+  const { user, session } = useAuth()
   const [thread, setThread] = useState<ChatThread | null>(null)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [message, setMessage] = useState('')
@@ -33,25 +32,36 @@ export default function ChatThreadPage() {
   // Data Fetching
   // Fetches thread details and messages
   // =============================================================================
-  useEffect(() => {
-    if (id && user) {
-      fetchThreadData()
-    }
-  }, [id, user])
-
-  const fetchThreadData = async () => {
+  const fetchThreadData = useCallback(async () => {
     try {
       setIsLoadingThread(true)
 
+      // Get the access token from the session
+      const accessToken = session?.access_token
+      if (!accessToken) {
+        console.error('No access token available')
+        setError('Authentication required')
+        return
+      }
+
+      const headers = {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      }
+
       // Fetch thread details
-      const threadResponse = await fetch(`/api/chat/threads/${id}`)
+      const threadResponse = await fetch(`/api/chat/threads/${id}`, {
+        headers,
+      })
       if (threadResponse.ok) {
         const threadData = await threadResponse.json()
         setThread(threadData.thread)
       }
 
       // Fetch messages
-      const messagesResponse = await fetch(`/api/chat/messages?threadId=${id}`)
+      const messagesResponse = await fetch(`/api/chat/messages?threadId=${id}`, {
+        headers,
+      })
       if (messagesResponse.ok) {
         const messagesData = await messagesResponse.json()
         setMessages(messagesData.messages || [])
@@ -62,23 +72,40 @@ export default function ChatThreadPage() {
     } finally {
       setIsLoadingThread(false)
     }
-  }
+  }, [id, session])
+
+  useEffect(() => {
+    if (id && user && session) {
+      fetchThreadData()
+    }
+  }, [id, user, session, fetchThreadData])
 
   // =============================================================================
   // Message Handling
   // Manages sending new messages and updating the conversation
   // =============================================================================
   const handleSendMessage = async () => {
-    if (!message.trim() || !user || !id) return
+    if (!message.trim() || !user || !id || !session) return
 
     setIsLoading(true)
     setError(null)
 
     try {
+      // Get the access token from the session
+      const accessToken = session?.access_token
+      if (!accessToken) {
+        throw new Error('Authentication required')
+      }
+
+      const headers = {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      }
+
       // Store user message
       const userMessageResponse = await fetch('/api/chat/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           threadId: id,
           role: 'user',
@@ -109,7 +136,7 @@ export default function ChatThreadPage() {
       // Store AI response
       const aiMessageResponse = await fetch('/api/chat/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           threadId: id,
           role: 'assistant',
@@ -134,12 +161,7 @@ export default function ChatThreadPage() {
     }
   }
 
-  const handleKeyPress = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault()
-      handleSendMessage()
-    }
-  }
+
 
   const clearError = () => setError(null)
 
@@ -223,7 +245,7 @@ export default function ChatThreadPage() {
                           marginLeft: msg.role === 'user' ? 'auto' : '0',
                         }}
                       >
-                        {msg.content}
+                        <MarkdownRenderer content={msg.content} />
                       </div>
                     </CardBody>
                   </Card>
@@ -237,26 +259,16 @@ export default function ChatThreadPage() {
         <div className="message-input-container">
           <Card>
             <CardBody>
-              <div style={{ marginBottom: '1rem' }}>
-                <TextArea
-                  value={message}
-                  onChange={(_, value) => setMessage(value)}
-                  placeholder="Type your message here..."
-                  rows={3}
-                  onKeyPress={handleKeyPress}
-                  disabled={isLoading}
-                  aria-label="Message input"
-                />
-              </div>
-
-              <Button
-                variant="primary"
-                onClick={handleSendMessage}
+              <MessageInput
+                onSend={(content) => {
+                  setMessage(content)
+                  // Trigger the send after setting the message
+                  setTimeout(() => handleSendMessage(), 0)
+                }}
+                placeholder="Type your message here..."
+                disabled={isLoading}
                 isLoading={isLoading}
-                isDisabled={!message.trim()}
-              >
-                Send Message
-              </Button>
+              />
             </CardBody>
           </Card>
         </div>

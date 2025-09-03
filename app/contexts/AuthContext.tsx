@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { createClientComponentClient } from '../lib/supabase'
 import type { Profile } from '../lib/supabase'
@@ -13,6 +13,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
+  refreshSession: () => Promise<{ user: User | null; session: Session | null } | void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -45,32 +46,67 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Profile Management
   // Fetches and manages user profile data
   // =============================================================================
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = useCallback(async (userId: string): Promise<Profile | null> => {
     try {
       console.log('AuthContext: Fetching profile for user:', userId)
+      
+      // Add timeout for profile fetch
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
+        .abortSignal(controller.signal)
         .single()
 
+      clearTimeout(timeoutId)
+
       if (error) {
-        console.error('Error fetching profile:', error)
+        // Handle specific error cases
+        if (error.code === 'PGRST116') {
+          console.log('AuthContext: Profile not found for user:', userId)
+        } else {
+          console.error('AuthContext: Error fetching profile:', error)
+        }
         return null
       }
 
       console.log('AuthContext: Profile fetched successfully:', data)
-      return data
+      return data as Profile
     } catch (error) {
-      console.error('Error fetching profile:', error)
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error('AuthContext: Profile fetch timeout')
+      } else {
+        console.error('AuthContext: Error fetching profile:', error)
+      }
       return null
     }
-  }
+  }, [supabase])
 
   const refreshProfile = async () => {
     if (user) {
       const profileData = await fetchProfile(user.id)
       setProfile(profileData)
+    }
+  }
+
+  const refreshSession = async () => {
+    try {
+      console.log('AuthContext: Refreshing session')
+      const { data, error } = await supabase.auth.refreshSession()
+      
+      if (error) {
+        console.error('AuthContext: Error refreshing session:', error)
+        throw error
+      }
+
+      console.log('AuthContext: Session refreshed successfully')
+      return data
+    } catch (error) {
+      console.error('AuthContext: Failed to refresh session:', error)
+      throw error
     }
   }
 
@@ -117,35 +153,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // =============================================================================
   // Session Management
-  // Monitors authentication state changes
+  // Monitors authentication state changes with proper error handling
   // =============================================================================
   useEffect(() => {
     console.log('AuthContext: Setting up session management')
+    
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
 
-    // Fallback timeout to ensure loading is never stuck
-    const fallbackTimeout = setTimeout(() => {
-      console.warn('AuthContext: Fallback timeout - forcing loading to false')
-      setLoading(false)
-    }, 5000)
-
-    const getSession = async () => {
+    const initializeAuth = async () => {
       try {
+        // Single timeout for the entire initialization process
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.warn('AuthContext: Initialization timeout - setting loading to false')
+            setLoading(false)
+          }
+        }, 10000) // 10 seconds - more reasonable timeout
+
         console.log('AuthContext: Getting initial session')
-
-        // Add timeout to prevent hanging
-        const timeoutId = setTimeout(() => {
-          console.error(
-            'AuthContext: Session timeout - forcing loading to false'
-          )
-          setLoading(false)
-        }, 3000)
-
+        
         const {
           data: { session },
           error,
         } = await supabase.auth.getSession()
 
-        clearTimeout(timeoutId)
+        if (!mounted) return // Component unmounted, don't update state
 
         if (error) {
           console.error('AuthContext: Error getting session:', error)
@@ -158,65 +191,118 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           userId: session?.user?.id,
         })
 
+        // Update auth state
         setSession(session)
         setUser(session?.user ?? null)
 
+        // Fetch profile if user exists
         if (session?.user) {
           console.log('AuthContext: User found in session, fetching profile')
-          const profileData = await fetchProfile(session.user.id)
-          setProfile(profileData)
+          try {
+            const profileData = await fetchProfile(session.user.id)
+            if (mounted) {
+              setProfile(profileData)
+            }
+          } catch (profileError) {
+            console.error('AuthContext: Error fetching profile:', profileError)
+            // Don't fail auth if profile fetch fails
+            if (mounted) {
+              setProfile(null)
+            }
+          }
         }
 
-        setLoading(false)
-        clearTimeout(fallbackTimeout)
-        console.log(
-          'AuthContext: Initial session check complete, loading set to false'
-        )
+        if (mounted) {
+          setLoading(false)
+          if (timeoutId) {
+            clearTimeout(timeoutId)
+            timeoutId = null
+          }
+        }
+
+        console.log('AuthContext: Initial session check complete')
       } catch (error) {
-        console.error('AuthContext: Error getting initial session:', error)
-        setLoading(false)
-        clearTimeout(fallbackTimeout)
+        console.error('AuthContext: Error during initialization:', error)
+        if (mounted) {
+          setLoading(false)
+          if (timeoutId) {
+            clearTimeout(timeoutId)
+            timeoutId = null
+          }
+        }
       }
     }
 
-    getSession()
+    // Initialize auth state
+    initializeAuth()
 
+    // Set up auth state listener
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return
+
       console.log('AuthContext: Auth state change event:', event, {
         hasSession: !!session,
         userId: session?.user?.id,
       })
 
+      // Handle different auth events
+      switch (event) {
+        case 'SIGNED_IN':
+          console.log('AuthContext: User signed in')
+          break
+        case 'SIGNED_OUT':
+          console.log('AuthContext: User signed out')
+          break
+        case 'TOKEN_REFRESHED':
+          console.log('AuthContext: Token refreshed')
+          break
+        case 'USER_UPDATED':
+          console.log('AuthContext: User updated')
+          break
+      }
+
+      // Update auth state
       setSession(session)
       setUser(session?.user ?? null)
 
+      // Handle profile management
       if (session?.user) {
-        console.log(
-          'AuthContext: User found in auth state change, fetching profile'
-        )
-        const profileData = await fetchProfile(session.user.id)
-        setProfile(profileData)
+        console.log('AuthContext: User found in auth state change, fetching profile')
+        try {
+          const profileData = await fetchProfile(session.user.id)
+          if (mounted) {
+            setProfile(profileData)
+          }
+        } catch (profileError) {
+          console.error('AuthContext: Error fetching profile in auth change:', profileError)
+          if (mounted) {
+            setProfile(null)
+          }
+        }
       } else {
-        console.log(
-          'AuthContext: No user in auth state change, clearing profile'
-        )
+        console.log('AuthContext: No user in auth state change, clearing profile')
         setProfile(null)
       }
 
-      setLoading(false)
-      clearTimeout(fallbackTimeout)
-      console.log(
-        'AuthContext: Auth state change complete, loading set to false'
-      )
+      // Set loading to false after handling auth change
+      if (mounted) {
+        setLoading(false)
+      }
+
+      console.log('AuthContext: Auth state change complete')
     })
 
+    // Cleanup function
     return () => {
-      clearTimeout(fallbackTimeout)
+      mounted = false
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
       subscription.unsubscribe()
     }
-  }, [supabase.auth])
+  }, [supabase.auth, fetchProfile]) // Include required dependencies
 
   const value = {
     user,
@@ -226,6 +312,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signInWithGoogle,
     signOut,
     refreshProfile,
+    refreshSession,
   }
 
   console.log('AuthContext: Rendering with state:', {
