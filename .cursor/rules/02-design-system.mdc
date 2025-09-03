@@ -1,0 +1,24 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# Design System and UI
+
+This rule defines the visual and interactive standards for the application's user interface. Consistency and accessibility are top priorities.
+
+## Component Library
+
+- **Design System**: All UI components must be implemented using PatternFly. Use the `@patternfly/react-core` and other relevant PatternFly packages.
+- **Custom Components**: If a required component does not exist in PatternFly, create a new component that adheres strictly to PatternFly's design principles, styles, and accessibility patterns.
+
+## Icons
+
+- **Icon Set**: Only use icons from the `@rhds/icons` package (Red Hat Display System Icons). Do not use icons from Font Awesome, Heroicons, or any other library.
+- **Usage**: Icons should be used purposefully to enhance clarity and should be accompanied by appropriate text labels or aria-labels for accessibility.
+
+## Styling
+
+- **CSS**: Use CSS-in-JS or PatternFly's built-in styling mechanisms. Avoid global stylesheets where possible, except for base theme setup.
+- **Theming**: The application must support both light and dark themes. Implement a theme switcher that allows the user to toggle between modes. Theme state should persist across sessions.

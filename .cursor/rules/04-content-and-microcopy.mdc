@@ -1,0 +1,24 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# Content and Microcopy
+
+This rule governs the voice, tone, and formatting of all user-facing text.
+
+## Brand Voice and Tone
+
+- **Standard**: All microcopy (button labels, tooltips, error messages, form placeholders, etc.) must adhere to the Red Hat brand personality standards.
+- **Core Principles**:
+  - **Be direct and clear**: Use simple, straightforward language. Avoid jargon.
+  - **Be helpful and supportive**: Guide the user and provide context.
+  - **Be authentic and genuine**: Write in a human, conversational tone.
+  - **Be passionate and inspiring**: Convey confidence and expertise.
+- **Reference**: For detailed guidance, always refer to the official Red Hat Brand Standards: https://www.redhat.com/en/about/brand/standards/personality
+
+## Formatting
+
+- **Capitalization**: Use sentence case for titles, headings, and labels unless brand guidelines specify otherwise.
+- **Punctuation**: Use punctuation for clarity and to maintain a professional tone.

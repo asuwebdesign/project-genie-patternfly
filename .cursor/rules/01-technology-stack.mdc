@@ -1,0 +1,27 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# Core Technology Stack
+
+This document outlines the core technologies and frameworks to be used in this project. All generated code must adhere to these specifications.
+
+## Framework and Language
+
+- **Framework**: Use Next.js (App Router) for all web application development.
+- **Language**: All code must be written in TypeScript. Enable and adhere to strict type checking.
+
+## AI and Language Models
+
+- **LLM Provider**: The application must integrate with a locally-running instance of Ollama to serve Large Language Models (LLMs).
+- **API Calls**: All interactions with the LLM must be handled through API routes within the Next.js application. Do not make direct client-side calls to the Ollama server.
+- **State Management**: Use React's built-in state management (e.g., `useState`, `useReducer`, `useContext`) for handling loading, error, and response states from the LLM. For more complex global state, consider Zustand.
+
+## Authentication and Database
+
+- **Provider**: Use Supabase for all authentication, user management, and database storage.
+- **SDK**: Use the official Supabase V2 client libraries (`@supabase/supabase-js` and `@supabase/ssr`) for all interactions.
+- **Authentication**: Implement secure, server-side authentication flows using Supabase Auth. Client-side authentication should be handled with the Supabase client, keeping sensitive keys in environment variables.
+- **Database**: Utilize PostgreSQL via the Supabase client for all data storage needs. All database queries should be typed.

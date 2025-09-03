@@ -1,0 +1,27 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# Accessibility and Responsiveness
+
+This rule ensures the application is usable by everyone, everywhere.
+
+## Accessibility
+
+- **Compliance**: All components and pages must be compliant with Web Content Accessibility Guidelines (WCAG) 2.1 Level AA standards.
+- **Semantic HTML**: Use semantic HTML elements (`<main>`, `<nav>`, `<article>`, etc.) to structure content correctly.
+- **ARIA Attributes**: Use appropriate ARIA (Accessible Rich Internet Applications) roles and attributes where necessary, especially for complex or dynamic components.
+- **Keyboard Navigation**: All interactive elements must be fully accessible and operable via keyboard.
+- **Testing**: Regularly use accessibility testing tools (e.g., Axe, Lighthouse) to audit components and pages.
+
+## Responsive Design
+
+- **Multi-Device Support**: The application layout must be fully responsive and optimized for a seamless experience on mobile, tablet, and desktop devices.
+- **Breakpoints**: Use PatternFly's standard breakpoints for media queries to ensure consistency with the design system.
+- **Fluid Layouts**: Use flexible grids, images, and typography to allow the layout to adapt to different screen sizes. Avoid fixed widths.
+
+## Browser Support
+
+- **Modern Browsers**: The application must support the latest two major versions of modern web browsers, including Google Chrome, Mozilla Firefox, Apple Safari, and Microsoft Edge.

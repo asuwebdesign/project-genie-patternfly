@@ -1,0 +1,44 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# Code Quality and Development Practices
+
+This rule establishes best practices for writing clean, maintainable, and understandable code.
+
+## Code Commenting
+
+- **Purpose**: To improve code clarity, scannability, and maintainability.
+- **Block Comments**: Use block comments to section off distinct logical chunks of code within a file or component. Each comment should briefly describe the purpose of the code block that follows it.
+
+```typescript
+// =============================================================================
+// Component State Management
+// Manages the user input and the response from the LLM API.
+// =============================================================================
+const [prompt, setPrompt] = useState('');
+const [isLoading, setIsLoading] = useState(false);
+
+// =============================================================================
+// Data Fetching Logic
+// Handles the API call to the local Ollama server via a Next.js route.
+// =============================================================================
+const handleSubmit = async () => { ... };
+```
+
+## File Structure
+
+- **Organization**: Follow the standard Next.js App Router directory structure.
+- **Component Co-location**: Place component-specific files (e.g., styles, tests) within the same directory as the component itself.
+
+## Error Handling
+
+- **Graceful Degradation**: Implement robust error handling for API calls, especially for interactions with Ollama and Supabase.
+- **User Feedback**: Display clear, user-friendly error messages when an operation fails. Avoid showing raw error objects or stack traces.
+
+## State Management
+
+- **Local State**: Use `useState` and `useReducer` for component-level state.
+- **Global State**: For state that needs to be shared across many components, use React Context or a lightweight library like Zustand. Avoid overly complex state management solutions unless absolutely necessary.

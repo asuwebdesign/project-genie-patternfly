@@ -1,42 +1,121 @@
+/* =============================================================================
+   PatternFly Base Styles
+   Import PatternFly base styles
+   ============================================================================= */
+@import '@patternfly/react-core/dist/styles/base.css';
+
+/* =============================================================================
+   PatternFly Custom Overrides
+   Custom token assignments and component styling overrides
+   ============================================================================= */
+
+/* Form Control Overrides */
+.pf-v6-c-form-control > :-webkit-any(input, select, textarea) {
+  --pf-v6-c-form-control--OutlineOffset: 0;
+}
+
+/* Custom Theme Variables */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Add custom CSS variables here for theming */
+  --pf-custom-primary-color: #0066cc;
+  --pf-custom-secondary-color: #6a6e73;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* =============================================================================
+   Custom Component Styles
+   Component-specific styling that extends PatternFly
+   ============================================================================= */
+
+/* Chat Message Styles */
+.chat-message {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+.chat-message.user {
+  background-color: var(--pf-v6-global--BackgroundColor--100);
+  border-left: 4px solid var(--pf-v6-global--primary-color--100);
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.chat-message.assistant {
+  background-color: var(--pf-v6-global--BackgroundColor--200);
+  border-left: 4px solid var(--pf-v6-global--success-color--100);
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+/* Navigation Styles */
+.nav-section {
+  margin-bottom: 1rem;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.nav-section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--pf-v6-global--Color--200);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  padding: 0 1rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+/* Search Modal Styles */
+.search-modal {
+  max-width: 600px;
+}
+
+.search-results {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Chat Thread Styles */
+.chat-thread-item {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.chat-thread-item:hover {
+  background-color: var(--pf-v6-global--BackgroundColor--200);
+}
+
+.chat-thread-item.active {
+  background-color: var(--pf-v6-global--primary-color--50);
+  border-left: 3px solid var(--pf-v6-global--primary-color--100);
+}
+
+/* Message Input Styles */
+.message-input-container {
+  position: sticky;
+  bottom: 0;
+  background-color: var(--pf-v6-global--BackgroundColor--100);
+  padding: 1rem;
+  border-top: 1px solid var(--pf-v6-global--BorderColor--100);
+}
+
+/* Loading States */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+/* Error States */
+.error-message {
+  color: var(--pf-v6-global--danger-color--100);
+  background-color: var(--pf-v6-global--danger-color--50);
+  border: 1px solid var(--pf-v6-global--danger-color--200);
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  margin: 1rem 0;
+}
+
+/* Success States */
+.success-message {
+  color: var(--pf-v6-global--success-color--100);
+  background-color: var(--pf-v6-global--success-color--50);
+  border: 1px solid var(--pf-v6-global--success-color--200);
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  margin: 1rem 0;
 }
