@@ -34,6 +34,10 @@
   --pf-v6-c-page__sidebar--MarginInlineEnd: 0;
 }
 
+.pf-v6-c-page__sidebar.pf-m-collapsed {
+  max-width: 44px !important;
+}
+
 .pf-v6-c-page__sidebar-body {
   --pf-v6-c-page__sidebar-body--PaddingInlineStart: var(
     --pf-t--global--spacer--lg
