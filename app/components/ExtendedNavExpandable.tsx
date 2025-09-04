@@ -7,18 +7,20 @@ interface CustomNavExpandableProps extends Omit<PFNavExpandableProps, 'ref'> {
   icon?: React.ReactNode
 }
 
-export const ExtendedNavExpandable: React.FC<CustomNavExpandableProps> = ({ 
-  icon, 
-  title, 
-  children, 
-  ...props 
+export const ExtendedNavExpandable: React.FC<CustomNavExpandableProps> = ({
+  icon,
+  title,
+  children,
+  ...props
 }) => {
   const titleWithIcon = icon ? (
     <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       {icon}
       {title}
     </span>
-  ) : title
+  ) : (
+    title
+  )
 
   return (
     <PFNavExpandable title={titleWithIcon} {...props}>

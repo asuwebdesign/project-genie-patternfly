@@ -11,7 +11,6 @@ import {
   NavList,
   NavItem,
   NavGroup,
-  NavExpandable,
   Button,
   Avatar,
   Dropdown,
@@ -23,6 +22,7 @@ import {
 import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
 import { SearchModal } from './SearchModal'
+import { ExtendedNavExpandable } from './ExtendedNavExpandable'
 import type { ChatThread } from '../lib/supabase'
 import {
   ClockRotateRight,
@@ -302,14 +302,12 @@ const ChatLayoutComponent = ({ children }: ChatLayoutProps) => {
                 Library
               </NavItem>
 
-              <NavExpandable
+              <ExtendedNavExpandable
                 title="History"
+                icon={<ClockRotateRight height={20} width={20} />}
                 isExpanded={isHistoryExpanded}
                 onExpand={() => setIsHistoryExpanded(!isHistoryExpanded)}
               >
-                <span style={{ position: 'absolute', left: 0, top: 0 }}>
-                  <ClockRotateRight height={20} width={20} />
-                </span>
                 {threadGroups.today.length > 0 && (
                   <NavGroup title="Today">
                     {threadGroups.today.map(renderThreadItem)}
@@ -346,7 +344,7 @@ const ChatLayoutComponent = ({ children }: ChatLayoutProps) => {
                     </div>
                   </NavItem>
                 )}
-              </NavExpandable>
+              </ExtendedNavExpandable>
             </NavList>
           </Nav>
         </div>

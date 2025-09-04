@@ -52,6 +52,18 @@
   justify-content: center;
 }
 
+/* Subnav Padding Override */
+.pf-v6-c-nav__subnav {
+  --pf-v6-c-nav__subnav--PaddingInlineStart: calc(
+    var(--pf-t--global--spacer--xl) - 4px
+  );
+}
+
+/* Section Title Padding Override */
+h2.pf-v6-c-nav__section-title {
+  font-size: var(--pf-t--global--FontSize--xs);
+}
+
 /* Form Control Overrides */
 .pf-v6-c-form-control > :-webkit-any(input, select, textarea) {
   --pf-v6-c-form-control--OutlineOffset: 0;
