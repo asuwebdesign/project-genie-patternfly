@@ -9,6 +9,11 @@
    Custom token assignments and component styling overrides
    ============================================================================= */
 
+/* Main Container Height Override */
+.pf-v6-c-page__main-container {
+  height: 100%;
+}
+
 /* Form Control Overrides */
 .pf-v6-c-form-control > :-webkit-any(input, select, textarea) {
   --pf-v6-c-form-control--OutlineOffset: 0;
