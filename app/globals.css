@@ -11,7 +11,45 @@
 
 /* Main Container Height Override */
 .pf-v6-c-page__main-container {
-  height: 100%;
+  --pf-v6-c-page__main-container--MaxHeight: 100%;
+  /* --pf-v6-c-page__main-container--MarginInlineStart: var(
+    --pf-t--global--spacer--lg
+  );
+  --pf-v6-c-page__main-container--MarginInlineEnd: var(
+    --pf-t--global--spacer--lg
+  );
+  --pf-v6-c-page__main-container--MarginBlockStart: var(
+    --pf-t--global--spacer--lg
+  );
+  --pf-v6-c-page__main-container--MarginBlockEnd: var(
+    --pf-t--global--spacer--lg
+  ); */
+  height: calc(100% - (var(--pf-t--global--spacer--lg) * 2));
+  margin: var(--pf-t--global--spacer--lg) !important;
+}
+
+/* Sidebar Width Override */
+.pf-v6-c-page__sidebar.pf-m-expanded {
+  --pf-v6-c-page__sidebar--PaddingBlockEnd: 0;
+  --pf-v6-c-page__sidebar--MarginInlineEnd: 0;
+}
+
+.pf-v6-c-page__sidebar-body {
+  --pf-v6-c-page__sidebar-body--PaddingInlineStart: var(
+    --pf-t--global--spacer--lg
+  );
+  --pf-v6-c-page__sidebar-body--PaddingInlineEnd: 0;
+}
+
+/* Navigation Link Alignment Override */
+.pf-v6-c-nav__link {
+  --pf-v6-c-nav__link--AlignItems: center;
+}
+
+.pf-v6-c-nav__link-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Form Control Overrides */
