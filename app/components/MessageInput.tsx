@@ -133,6 +133,7 @@ export function MessageInput({
           onClick={handleSend}
           isLoading={isLoading}
           isDisabled={disabled || !editor?.getText().trim()}
+          ouiaId="message-send-button"
         >
           Send Message
         </Button>

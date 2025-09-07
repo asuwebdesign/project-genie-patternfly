@@ -22,8 +22,13 @@ export const ExtendedNavExpandable: React.FC<CustomNavExpandableProps> = ({
     title
   )
 
+  // Filter out any undefined/empty string props that might cause the inert warning
+  const cleanProps = Object.fromEntries(
+    Object.entries(props).filter(([, value]) => value !== '' && value !== undefined)
+  )
+
   return (
-    <PFNavExpandable title={titleWithIcon} {...props}>
+    <PFNavExpandable title={titleWithIcon} {...cleanProps}>
       {children}
     </PFNavExpandable>
   )

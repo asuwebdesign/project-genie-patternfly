@@ -6,7 +6,6 @@ import {
   LoginPage,
   LoginMainFooterLinksItem,
   Button,
-  List,
   ListItem,
   LoginFooterItem,
 } from '@patternfly/react-core'
@@ -82,6 +81,7 @@ export default function HomePage() {
         onClick={handleGoogleSignIn}
         isDisabled={loading}
         style={{ width: '100%', marginTop: '1rem' }}
+        ouiaId="google-sign-in-button"
       >
         {loading ? 'Signing in...' : 'Sign in with Google'}
       </Button>
@@ -129,6 +129,7 @@ export default function HomePage() {
         loginSubtitle="Sign in to start chatting with AI"
         socialMediaLoginContent={socialMediaLoginContent}
         socialMediaLoginAriaLabel="Sign in with Google"
+        ouiaId="main-login-page"
       />
     </ClientOnly>
   )

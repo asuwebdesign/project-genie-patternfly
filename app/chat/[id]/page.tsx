@@ -59,9 +59,12 @@ export default function ChatThreadPage() {
       }
 
       // Fetch messages
-      const messagesResponse = await fetch(`/api/chat/messages?threadId=${id}`, {
-        headers,
-      })
+      const messagesResponse = await fetch(
+        `/api/chat/messages?threadId=${id}`,
+        {
+          headers,
+        }
+      )
       if (messagesResponse.ok) {
         const messagesData = await messagesResponse.json()
         setMessages(messagesData.messages || [])
@@ -161,8 +164,6 @@ export default function ChatThreadPage() {
     }
   }
 
-
-
   const clearError = () => setError(null)
 
   if (isLoadingThread) {
@@ -230,25 +231,21 @@ export default function ChatThreadPage() {
                     marginBottom: '1rem',
                   }}
                 >
-                  <Card>
-                    <CardBody>
-                      <div
-                        style={{
-                          backgroundColor:
-                            msg.role === 'user'
-                              ? 'var(--pf-v6-global--primary-color--100)'
-                              : 'var(--pf-v6-global--BackgroundColor--200)',
-                          color: msg.role === 'user' ? 'white' : 'inherit',
-                          padding: '1rem',
-                          borderRadius: '0.5rem',
-                          maxWidth: '80%',
-                          marginLeft: msg.role === 'user' ? 'auto' : '0',
-                        }}
-                      >
-                        <MarkdownRenderer content={msg.content} />
-                      </div>
-                    </CardBody>
-                  </Card>
+                  <div
+                    style={{
+                      backgroundColor:
+                        msg.role === 'user'
+                          ? 'var(--pf-v6-global--primary-color--100)'
+                          : 'var(--pf-v6-global--BackgroundColor--200)',
+                      color: msg.role === 'user' ? 'white' : 'inherit',
+                      padding: '1rem',
+                      borderRadius: '0.5rem',
+                      maxWidth: '80%',
+                      marginLeft: msg.role === 'user' ? 'auto' : '0',
+                    }}
+                  >
+                    <MarkdownRenderer content={msg.content} />
+                  </div>
                 </div>
               ))}
             </div>
@@ -260,7 +257,7 @@ export default function ChatThreadPage() {
           <Card>
             <CardBody>
               <MessageInput
-                onSend={(content) => {
+                onSend={content => {
                   setMessage(content)
                   // Trigger the send after setting the message
                   setTimeout(() => handleSendMessage(), 0)

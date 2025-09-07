@@ -13,9 +13,11 @@ import {
 import { ChatLayout } from '../components/ChatLayout'
 import { MessageInput } from '../components/MessageInput'
 import { useAuth } from '../contexts/AuthContext'
+import { useThreads } from '../hooks/useThreads'
 
 export default function ChatPage() {
   const { user } = useAuth()
+  const { createThreadAsync } = useThreads()
   const router = useRouter()
   const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -36,18 +38,9 @@ export default function ChatPage() {
       // Create new thread if none exists
       let threadId = currentThreadId
       if (!threadId) {
-        const threadResponse = await fetch('/api/chat/threads', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title: message.substring(0, 50) + '...' }),
-        })
-
-        if (!threadResponse.ok) {
-          throw new Error('Failed to create chat thread')
-        }
-
-        const threadData = await threadResponse.json()
-        threadId = threadData.thread.id
+        // Use React Query mutation with optimistic updates
+        const newThread = await createThreadAsync(message.substring(0, 50) + '...')
+        threadId = newThread.id
         setCurrentThreadId(threadId)
       }
 
@@ -121,12 +114,13 @@ export default function ChatPage() {
             title="Error"
             actionClose={<AlertActionCloseButton onClose={clearError} />}
             style={{ marginBottom: '1rem' }}
+            ouiaId="chat-page-error-alert"
           >
             {error}
           </Alert>
         )}
 
-        <Card>
+        <Card ouiaId="chat-input-card">
           <CardBody>
             <MessageInput
               onSend={(content) => {

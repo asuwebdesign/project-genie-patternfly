@@ -4,6 +4,8 @@ import '@patternfly/react-core/dist/styles/base.css'
 import './globals.css'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { AuthProvider } from './contexts/AuthContext'
+import { ChatProvider } from './contexts/ChatContext'
+import { QueryProvider } from './contexts/QueryProvider'
 import { SessionErrorBoundary } from './components/SessionErrorBoundary'
 
 const geistSans = Geist({
@@ -36,9 +38,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <SessionErrorBoundary>
-          <ThemeProvider>
-            <AuthProvider>{children}</AuthProvider>
-          </ThemeProvider>
+          <QueryProvider>
+            <ThemeProvider>
+              <AuthProvider>
+                <ChatProvider>{children}</ChatProvider>
+              </AuthProvider>
+            </ThemeProvider>
+          </QueryProvider>
         </SessionErrorBoundary>
       </body>
     </html>

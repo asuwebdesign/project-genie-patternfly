@@ -106,6 +106,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       onClose={onClose}
       className="search-modal"
       variant="medium"
+      ouiaId="search-chats-modal"
     >
       <ModalHeader title="Search chats" labelId="search-chats" />
       <ModalBody>
@@ -123,6 +124,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
           onClick={handleSearch}
           isLoading={isSearching}
           style={{ marginTop: '0.5rem' }}
+          ouiaId="search-execute-button"
         >
           Search
         </Button>
@@ -156,14 +158,14 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       )}
 
       {searchTerm && !isSearching && searchResults.length === 0 && (
-        <EmptyState>
+        <EmptyState ouiaId="no-results-empty-state">
           <EmptyStateBody>
             <h4>No results found</h4>
             <p>
               No chat threads found matching &quot;{searchTerm}&quot;. Try a different
               search term.
             </p>
-            <Button variant="primary" onClick={() => setSearchTerm('')}>
+            <Button variant="primary" onClick={() => setSearchTerm('')} ouiaId="clear-search-button">
               Clear search
             </Button>
           </EmptyStateBody>
@@ -171,7 +173,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       )}
 
       {!searchTerm && allThreads.length === 0 && (
-        <EmptyState>
+        <EmptyState ouiaId="no-threads-empty-state">
           <EmptyStateBody>
             <h4>No chat threads yet</h4>
             <p>Start a conversation to see your chat threads here.</p>
